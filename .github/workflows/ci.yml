@@ -14,7 +14,7 @@ jobs:
       - name: Python Setup
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.10"
       - name: Install Requirements
         run: |
           pip install dvc dvc_gs pandas joblib pytest scikit-learn==1.7.2
