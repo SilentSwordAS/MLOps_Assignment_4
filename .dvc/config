@@ -5,3 +5,4 @@
 ['remote "bucketremote"']
     url = gs://mlops-week1-seventh-seeker-473207-h9/
     projectname = seventh-seeker-473207-h9
+    credentialpath = key.json
