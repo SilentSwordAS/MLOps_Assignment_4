@@ -26,7 +26,7 @@ jobs:
           pytest -s test_evaluation.py > results.txt
           cat results.txt 
       - name: Setup CML
-        uses: iterative/setup-cml@v1
+        uses: iterative/setup-cml@v2
 
       - name: Post CML report
         env:
