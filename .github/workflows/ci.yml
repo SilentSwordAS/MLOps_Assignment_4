@@ -17,7 +17,7 @@ jobs:
           python-version: "3.9"
       - name: Install Requirements
         run: |
-          pip install dvc dvc_gcs pandas joblib pytest scikit-learn
+          pip install dvc dvc_gs pandas joblib pytest scikit-learn
       - name: DVC Pull and Checkout For Generating the CSV files
         run: |
           dvc pull
