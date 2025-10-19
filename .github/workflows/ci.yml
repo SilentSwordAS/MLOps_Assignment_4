@@ -26,9 +26,7 @@ jobs:
         run: dvc remote modify --local bucketremote credentialpath key.json
       - name: DVC Pull and Checkout For Generating the data files
         run: |
-          python -m json.tool "key.json"
-          dvc pull
-          dvc checkout
+          dvc pull && dvc checkout
       - name: PyTest File Execution
         run: |
           pytest test_evaluation.py > results.txt
