@@ -25,3 +25,13 @@ jobs:
         run: |
           pytest -s test_evaluation.py > results.txt
           cat results.txt 
+      - name: Setup CML
+        uses: iterative/setup-cml@v1
+
+      - name: Post CML report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## Pytest results" > report.md
+          cat result.txt >> report.md
+          cml comment create report.md
