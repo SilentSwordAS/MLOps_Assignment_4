@@ -23,5 +23,5 @@ jobs:
           dvc checkout
       - name: PyTest File Execution
         run: |
-          pytest test_evaluation.py > results.txt
+          pytest -s test_evaluation.py > results.txt
           cat results.txt 
