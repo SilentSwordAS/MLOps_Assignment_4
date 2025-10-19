@@ -18,11 +18,17 @@ jobs:
       - name: Install Requirements
         run: |
           pip install dvc dvc_gs pandas joblib pytest scikit-learn
-      - name: DVC Pull and Checkout For Generating the CSV files
+      - name: Setup GCP Service Account Key
+        run: |
+          echo "${{ secrets.GCP_KEY_JSON }}" > key.json
+          export GOOGLE_APPLICATION_CREDENTIALS="key.json"
+      - name: Configure DVC Remote
+        run: dvc remote modify --local gcsremote credentialpath key.json
+      - name: DVC Pull and Checkout For Generating the data files
         run: |
           dvc pull
           dvc checkout
-      - name: Running out pytest file
+      - name: PyTest File Execution
         run: |
           pytest test_evaluation.py > results.txt
           cat results.txt 
