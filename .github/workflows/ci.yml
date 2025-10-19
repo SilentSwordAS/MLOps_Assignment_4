@@ -25,4 +25,5 @@ jobs:
       dvc checkout
   - name: Running out pytest file
     run: |
-      pytest test_evaluation.py 
+      pytest test_evaluation.py > results.txt
+      cat results.txt 
