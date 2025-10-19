@@ -21,7 +21,7 @@ jobs:
       - name: Setup GCP Service Account Key
         run: |
           echo "${{ secrets.GCP_KEY_JSON }}" > key.json
-          export GOOGLE_APPLICATION_CREDENTIALS="key.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/key.json" >> $GITHUB_ENV
       - name: Configure DVC Remote
         run: dvc remote modify --local bucketremote credentialpath key.json
       - name: DVC Pull and Checkout For Generating the data files
