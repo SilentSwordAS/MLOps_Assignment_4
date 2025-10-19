@@ -7,7 +7,7 @@ on:
     branches: [main, dev]
 
 permissions:
-  contents: write,
+  contents: write
   pull_requests: write
 
 jobs:
