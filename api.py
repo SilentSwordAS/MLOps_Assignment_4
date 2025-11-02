@@ -37,9 +37,9 @@ model_loaded = mlflow.sklearn.load_model(f"models:/{best_run_model_name}/{max([v
 # Input Schema
 
 class IrisInput(BaseModel):
-    sepal_length: float,
-    sepal_width: float,
-    petal_length: float,
+    sepal_length: float
+    sepal_width: float
+    petal_length: float
     petal_width: float
 
 @app.get('/')
