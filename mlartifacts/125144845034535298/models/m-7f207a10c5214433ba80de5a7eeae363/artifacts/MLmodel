@@ -1,0 +1,30 @@
+artifact_path: mlflow-artifacts:/125144845034535298/models/m-7f207a10c5214433ba80de5a7eeae363/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.18
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+is_signature_from_type_hint: false
+mlflow_version: 3.5.1
+model_id: m-7f207a10c5214433ba80de5a7eeae363
+model_size_bytes: 1732
+model_uuid: m-7f207a10c5214433ba80de5a7eeae363
+prompts: null
+run_id: 2bb2e62b91a34365a6acbac249ad1ffb
+signature:
+  inputs: '[{"type": "float", "name": "sepal_length", "required": true}, {"type":
+    "float", "name": "sepal_width", "required": true}, {"type": "float", "name": "petal_length",
+    "required": true}, {"type": "float", "name": "petal_width", "required": true}]'
+  outputs: '[{"type": "string", "name": "species", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-11-02 16:58:00.535798'

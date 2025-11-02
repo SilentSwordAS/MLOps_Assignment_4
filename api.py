@@ -1,22 +1,33 @@
-import pytest
-from sklearn.model_selection import train_test_split
+from fastapi import FastAPI
+from pydantic import BaseModel
+import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
 import mlflow
 import mlflow.sklearn
 from mlflow.tracking import MlflowClient
+import subprocess
+import os
+
+app = FastAPI(title="IRIS Classifier API")
+
+le = LabelEncoder()
+
+if os.path.isfile('augmented_train_v2.csv'):
+  subprocess.run('python train_model.py augmented_train_v2',shell=True)
+
+data = pd.read_csv('augmented_train_v2.csv')
+X_train, X_test = train_test_split(data, test_size=0.2, random_state=42, stratify=data['species'])
+y_train = le.fit_transform(X_train['species'])
+# Load the best model
 
 # Setting the experiment and the tracking uri
 public_ip = '136.116.214.14'
 mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
 mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 client = MlflowClient(tracking_uri = f"http://{public_ip}:7600/")
-
-# Loading the dataset
-data = pd.read_csv('augmented_train_v2.csv')
-X_train, X_test = train_test_split(data, test_size=0.2, random_state=42, stratify=data['species'])
-le = LabelEncoder()
 
 # Need to get experiment_id to access the run_id and the model name of our best model to register it.
 
@@ -33,23 +44,24 @@ all_versions = client.search_model_versions(f"name='{best_run_model_name}'")
 # Loading the Model
 
 model_loaded = mlflow.sklearn.load_model(f"models:/{best_run_model_name}/{max([v.version for v in all_versions])}")
-y_train = le.fit_transform(X_train['species'])
 
-# Test Cases
+# Input Schema
 
-def test_model_exists():
-    assert model_loaded
+class IrisInput(BaseModel):
+    sepal_length: float
+    sepal_width: float
+    petal_length: float
+    petal_width: float
 
-def test_model_accuracy():
-    y_pred = model_loaded.predict(X_test.drop(['species'], axis=1))
-    model_score = accuracy_score(le.transform(X_test['species']), y_pred)
-    assert model_score > 0.9
+@app.get('/')
+def read_root():
+    return {"message":"Model initialized successfully!"}
 
-def test_data_header_validation():
-    data_columns = list(data.columns.values)
-    assert len(data_columns) == 5
-
-def test_data_number_validation():
-    assert len(data) == 300
-
+@app.post("/predict")
+def predict_species(data: IrisInput):
+    input_df = pd.DataFrame([data.dict()])
+    prediction = model_loaded.predict(input_df)
+    return {
+        "predicted_class": str(le.inverse_transform(prediction)[0])
+    }
 

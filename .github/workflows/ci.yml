@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [main, dev]
 
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  LOCATION: us-central1
+  REPOSITORY: iris-classifier-api-repo
+  IMAGE: iris-classifier-api
+  CLUSTER_NAME: iris-classifier-api-cluster
+  CLUSTER_LOCATION: us-central1
+  DEPLOYMENT_NAME: deploy-iris-classifier-api
+
 permissions:
   contents: write
   pull-requests: write
@@ -15,20 +24,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact registry
+        run: |
+          gcloud auth configure-docker $LOCATION-docker.pkg.dev
+
       - name: Python Setup
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
+
       - name: Install Requirements
         run: |
-          pip install dvc dvc_gs pandas joblib pytest scikit-learn==1.7.2
-      - name: DVC Pull and Checkout For Generating the data files
+          pip install dvc dvc_gs pandas joblib pytest scikit-learn==1.7.2 mlflow
+
+      - name: DVC Checkout For Generating the data files
         run: |
           dvc checkout
+
       - name: PyTest File Execution
         run: |
           pytest -s test_evaluation.py > results.txt
-          cat results.txt 
+          cat results.txt
+ 
       - name: Setup CML
         uses: iterative/setup-cml@v3
 
@@ -39,3 +62,27 @@ jobs:
           echo "## Pytest results" > report.md
           cat results.txt >> report.md
           cml comment create report.md
+
+      - name: Docker Image Build
+        run: |
+          docker build -t $LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA .
+
+      - name: Push Docker Image
+        run: |
+          docker push $LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
+
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update
+          sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
+
+      - name: Get GKE Credentials
+        run: |
+          gcloud container clusters get-credentials $CLUSTER_NAME --region $CLUSTER_LOCATION --project $PROJECT_ID 
+
+      - name: Deploy to GKE using kubectl
+        run: |
+          CONTAINER_NAME=$(kubectl get deployment $DEPLOYMENT_NAME -o jsonpath='{.spec.template.spec.containers[*].name}')
+          kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
