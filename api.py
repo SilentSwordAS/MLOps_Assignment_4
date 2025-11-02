@@ -12,8 +12,10 @@ app = FastAPI(title="IRIS Classifier API")
 
 # Load the best model
 
-# Setting Tracking URI
-public_ip = "136.111.227.110"
+# Setting the experiment and the tracking uri
+public_ip = '136.111.227.110'
+mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
+mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 client = MlflowClient(tracking_uri = f"http://{public_ip}:7600/")
 
 # Need to get experiment_id to access the run_id and the model name of our best model to register it.
