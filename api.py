@@ -9,19 +9,22 @@ import mlflow
 import mlflow.sklearn
 from mlflow.tracking import MlflowClient
 import subprocess
+import os
 
 app = FastAPI(title="IRIS Classifier API")
 
-data = pd.read_csv('augmented_train_v2.csv')
-X_train, X_test = train_test_split(data, test_size=0.2, random_state=42, stratify=data['species'])
 le = LabelEncoder()
 
-le.fit_transform(X_test['species'])
+if not os.path.isfile('augmented_train_v2.csv'):
+    subprocess.run('dvc checkout',shell=True)
 
+data = pd.read_csv('augmented_train_v2.csv')
+X_train, X_test = train_test_split(data, test_size=0.2, random_state=42, stratify=data['species'])
+y_train = le.fit_transform(X_train['species'])
 # Load the best model
 
 # Setting the experiment and the tracking uri
-public_ip = '34.9.255.250'
+public_ip = '136.111.227.110'
 mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
 mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 client = MlflowClient(tracking_uri = f"http://{public_ip}:7600/")
@@ -52,16 +55,17 @@ class IrisInput(BaseModel):
 
 @app.get('/')
 def read_root():
-    subprocess.run('dvc checkout',shell=True)
-    subprocess.run('python train_model.py augmented_train_v2',shell=True)
-    return {"message":"Model initialized and trained successfully!"}
+    return {"message":"Model initialized successfully!"}
 
 @app.post("/predict")
 def predict_species(data: IrisInput):
     input_df = pd.DataFrame([data.dict()])
-    prediction = model_loaded.predict(input_df)[0]
+    prediction = model_loaded.predict(input_df)
     return {
-        "predicted_class": le.inverse_transform(prediction)
+        "predicted_class": str(le.inverse_transform(prediction)[0])
     }
 
-    
+@app.get("/train")
+def train_model():
+    subprocess.run('python train_model.py augmented_train_v2',shell=True)
+    return {"message":"Model Trained Successfully!"}
