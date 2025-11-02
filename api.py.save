@@ -54,7 +54,7 @@ def predict_species(data: IrisInput):
     input_df = pd.DataFrame([data.dict()])
     prediction = model_loaded.predict(input_df)[0]
     return {
-        "predicted_class": str(prediction)
+        "predicted_class": le.inverse_transform(prediction)
     }
 
     
