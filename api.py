@@ -15,8 +15,8 @@ app = FastAPI(title="IRIS Classifier API")
 
 le = LabelEncoder()
 
-if not os.path.isfile('augmented_train_v2.csv'):
-    subprocess.run('dvc checkout',shell=True)
+if os.path.isfile('augmented_train_v2.csv'):
+  subprocess.run('python train_model.py augmented_train_v2',shell=True)
 
 data = pd.read_csv('augmented_train_v2.csv')
 X_train, X_test = train_test_split(data, test_size=0.2, random_state=42, stratify=data['species'])
@@ -65,7 +65,3 @@ def predict_species(data: IrisInput):
         "predicted_class": str(le.inverse_transform(prediction)[0])
     }
 
-@app.get("/train")
-def train_model():
-    subprocess.run('python train_model.py augmented_train_v2',shell=True)
-    return {"message":"Model Trained Successfully!"}
