@@ -84,4 +84,4 @@ jobs:
 
       - name: Deploy to GKE using kubectl
         run: |
-          kubectl set image deployment/$DEPLOYMENT_NAME $DEPLOYMENT_NAME=$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
+          kubectl set image deployment/$DEPLOYMENT_NAME $IMAGE=$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
