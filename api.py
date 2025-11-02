@@ -4,12 +4,19 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
 import mlflow
 import mlflow.sklearn
 from mlflow.tracking import MlflowClient
 import subprocess
 
 app = FastAPI(title="IRIS Classifier API")
+
+data = pd.read_csv('augmented_train_v2.csv')
+X_train, X_test = train_test_split(data, test_size=0.2, random_state=42, stratify=data['species'])
+le = LabelEncoder()
+
+le.fit_transform(X_test['species'])
 
 # Load the best model
 
@@ -54,7 +61,7 @@ def predict_species(data: IrisInput):
     input_df = pd.DataFrame([data.dict()])
     prediction = model_loaded.predict(input_df)[0]
     return {
-        "predicted_class": str(prediction)
+        "predicted_class": le.inverse_transform(prediction)
     }
 
     
