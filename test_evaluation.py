@@ -8,7 +8,7 @@ import mlflow.sklearn
 from mlflow.tracking import MlflowClient
 
 # Setting the experiment and the tracking uri
-public_ip = '136.116.214.14'
+public_ip = '35.188.196.11'
 mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
 mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 client = MlflowClient(tracking_uri = f"http://{public_ip}:7600/")

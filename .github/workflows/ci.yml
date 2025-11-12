@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Requirements
         run: |
-          pip install dvc dvc_gs pandas joblib pytest scikit-learn==1.7.2 mlflow
+          pip install dvc dvc_gs pandas joblib pytest scikit-learn==1.7.2 mlflow opentelemetry-exporter-gcp-trace
 
       - name: DVC Checkout For Generating the data files
         run: |
@@ -51,7 +51,7 @@ jobs:
         run: |
           pytest -s test_evaluation.py > results.txt
           cat results.txt
- 
+
       - name: Setup CML
         uses: iterative/setup-cml@v3
 
@@ -65,11 +65,12 @@ jobs:
 
       - name: Docker Image Build
         run: |
-          docker build -t $LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA .
+          docker build -t $LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE .
+          docker tag $IMAGE us-central1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest
 
       - name: Push Docker Image
         run: |
-          docker push $LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
+          docker push $LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest
 
       - name: Install gke-gcloud-auth-plugin
         run: |
@@ -80,9 +81,8 @@ jobs:
 
       - name: Get GKE Credentials
         run: |
-          gcloud container clusters get-credentials $CLUSTER_NAME --region $CLUSTER_LOCATION --project $PROJECT_ID 
+          gcloud container clusters get-credentials $CLUSTER_NAME --region $CLUSTER_LOCATION --project $PROJECT_ID
 
       - name: Deploy to GKE using kubectl
         run: |
-          CONTAINER_NAME=$(kubectl get deployment $DEPLOYMENT_NAME -o jsonpath='{.spec.template.spec.containers[*].name}')
-          kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
+          kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest

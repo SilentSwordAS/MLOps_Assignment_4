@@ -11,7 +11,7 @@ from mlflow.types.schema import Schema, ColSpec
 from mlflow.tracking import MlflowClient
 
 # Setting the experiment and the tracking uri
-public_ip = '136.116.214.14'
+public_ip = '35.188.196.11'
 mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
 mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 
@@ -51,18 +51,18 @@ for param in param_grid:
     with mlflow.start_run() as run:
         model = DecisionTreeClassifier(**param)
         model.fit(X_train.drop(['species'],axis=1), le.fit_transform(X_train['species']))
-        
+
         y_test = le.transform(X_test['species'])
         y_pred = model.predict(X_test.drop(['species'],axis=1))
-        
+
         acc_score = accuracy_score(y_test, y_pred)
-        
+
         signature = ModelSignature(inputs = input_schema, outputs = output_schema)
-        
+
         mlflow.log_params(param)
         mlflow.log_metric("accuracy", acc_score)
         mlflow.sklearn.log_model(sk_model=model, signature = signature,name="model")
-        
+
 # Need to get experiment_id to access the run_id and the model name of our best model to register it.
 
 experiment_id = mlflow.get_experiment_by_name("Iris_Classifier_Pipeline_2").experiment_id

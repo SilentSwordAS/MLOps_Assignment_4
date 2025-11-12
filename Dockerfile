@@ -1,5 +1,5 @@
 # Use official Python base image
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY * /app
 
 # Install dependencies
-RUN pip install fastapi uvicorn dvc dvc_gs pandas joblib pytest scikit-learn==1.7.2 mlflow
+RUN pip install fastapi uvicorn dvc dvc_gs pandas joblib pytest scikit-learn==1.7.2 mlflow opentelemetry-exporter-gcp-trace
 
 # Expose Port
 EXPOSE 8600
