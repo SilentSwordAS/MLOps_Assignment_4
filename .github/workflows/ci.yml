@@ -65,7 +65,7 @@ jobs:
 
       - name: Docker Image Build
         run: |
-          docker build -t $LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE .
+          docker build -t $IMAGE .
           docker tag $IMAGE us-central1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest
 
       - name: Push Docker Image
