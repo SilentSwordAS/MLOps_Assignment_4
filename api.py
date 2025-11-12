@@ -101,7 +101,7 @@ y_train = le.fit_transform(X_train['species'])
 # Load the best model
 
 # Setting the experiment and the tracking uri
-public_ip = '34.136.156.223'
+public_ip = '35.188.196.11'
 mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
 mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 client = MlflowClient(tracking_uri = f"http://{public_ip}:7600/")
