@@ -82,7 +82,7 @@ jobs:
       - name: Stress Test
         run: |
           sudo apt-get install wrk
-          echo wrk -t4 -c100 -d60s --latency -s post.lua http://34.57.195.177:80/predict >> stress_test.txt
+          wrk -t4 -c100 -d60s --latency -s post.lua http://34.57.195.177:80/predict >> stress_test.txt
       - name: Post CML report
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
