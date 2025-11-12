@@ -21,6 +21,8 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 
+app = FastAPI(title="IRIS Classifier API")
+
 # Setup Tracer
 trace.set_tracer_provider(TracerProvider())
 tracer = trace.get_tracer(__name__)
@@ -87,7 +89,6 @@ async def exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal Server Error", "trace_id": trace_id},
     )
 
-app = FastAPI(title="IRIS Classifier API")
 
 le = LabelEncoder()
 
