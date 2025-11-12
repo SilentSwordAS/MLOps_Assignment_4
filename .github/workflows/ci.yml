@@ -13,7 +13,7 @@ env:
   IMAGE: iris-classifier-api
   CLUSTER_NAME: iris-classifier-api-cluster
   CLUSTER_LOCATION: us-central1-a
-  DEPLOYMENT_NAME: deploy-iris-classifier-api
+  DEPLOYMENT_NAME: iris-classifier-service
 
 permissions:
   contents: write
