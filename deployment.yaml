@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iris-classifier-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: iris-classifier-service
+  template:
+    metadata:
+      labels:
+        app: iris-classifier-service
+    spec:
+      serviceAccountName: telemetry-access  # See below
+      containers:
+      - name: fastapi-container
+        image: us-central1-docker.pkg.dev/seventh-seeker-473207-h9/iris-classifier-api-repo/iris-classifier-api:latest
+        ports:
+        - containerPort: 8600
+        readinessProbe:
+          httpGet:
+            path: /ready_check
+            port: 8600
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /live_check
+            port: 8600
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

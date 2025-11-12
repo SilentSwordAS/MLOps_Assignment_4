@@ -12,7 +12,7 @@ env:
   REPOSITORY: iris-classifier-api-repo
   IMAGE: iris-classifier-api
   CLUSTER_NAME: iris-classifier-api-cluster
-  CLUSTER_LOCATION: us-central1
+  CLUSTER_LOCATION: us-central1-a
   DEPLOYMENT_NAME: deploy-iris-classifier-api
 
 permissions:
