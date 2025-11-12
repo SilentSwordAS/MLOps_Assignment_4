@@ -14,6 +14,7 @@ env:
   CLUSTER_NAME: iris-classifier-api-cluster
   CLUSTER_LOCATION: us-central1-a
   DEPLOYMENT_NAME: iris-classifier-service
+  CONTAINER_NAME: fastapi-container
 
 permissions:
   contents: write
@@ -85,4 +86,4 @@ jobs:
 
       - name: Deploy to GKE using kubectl
         run: |
-          kubectl set image deployment/$DEPLOYMENT_NAME $IMAGE=$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest
+          kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:latest
