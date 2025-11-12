@@ -151,7 +151,7 @@ async def predict(input: IrisInput, request: Request):
                 "event": "prediction",
                 "trace_id": trace_id,
                 "input": input.dict(),
-                "result": result,
+                "result": str(le.inverse_transform(result)[0]),
                 "latency_ms": latency,
                 "status": "success"
             }))
