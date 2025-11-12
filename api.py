@@ -101,7 +101,7 @@ y_train = le.fit_transform(X_train['species'])
 # Load the best model
 
 # Setting the experiment and the tracking uri
-public_ip = '35.188.196.11'
+public_ip = '34.136.156.223'
 mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
 mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 client = MlflowClient(tracking_uri = f"http://{public_ip}:7600/")
@@ -142,13 +142,15 @@ async def predict(input: IrisInput, request: Request):
 
         try:
             input_data = pd.DataFrame([input.dict()])
+            print(input_data)
             result = model_loaded.predict(input_data)
+            print(result)
             latency = round((time.time() - start_time) * 1000, 2)
 
             logger.info(json.dumps({
                 "event": "prediction",
                 "trace_id": trace_id,
-                "input": input_data.to_dict(),
+                "input": input.dict(),
                 "result": result,
                 "latency_ms": latency,
                 "status": "success"
