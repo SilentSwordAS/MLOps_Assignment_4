@@ -1,4 +1,4 @@
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
@@ -11,7 +11,7 @@ from mlflow.types.schema import Schema, ColSpec
 from mlflow.tracking import MlflowClient
 
 # Setting the experiment and the tracking uri
-public_ip = '35.188.196.11'
+public_ip = '34.44.133.128'
 mlflow.set_tracking_uri(f"http://{public_ip}:7600/")
 mlflow.set_experiment("Iris_Classifier_Pipeline_2")
 
@@ -35,8 +35,8 @@ X_train = pd.read_csv(f'{sys.argv[1]}.csv')
 X_test = pd.read_csv(f'{sys.argv[2]}.csv')
 
 # Defining multiple hyperparameters to perform hyperparameter tuning
-with mlflow.start_run() as ru
-    model = DecisionTreeClassifier(max_depth=3)
+with mlflow.start_run() as run:
+    model = LogisticRegression()
     model.fit(X_train.drop(['species'],axis=1), le.fit_transform(X_train['species']))
 
     y_test = le.transform(X_test['species'])
@@ -46,7 +46,6 @@ with mlflow.start_run() as ru
 
     signature = ModelSignature(inputs = input_schema, outputs = output_schema)
 
-    mlflow.log_params(param)
     mlflow.log_metric("accuracy", acc_score)
     mlflow.sklearn.log_model(sk_model=model, signature = signature,name="model")
 
