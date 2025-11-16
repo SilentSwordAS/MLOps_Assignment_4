@@ -29,39 +29,26 @@ output_schema = Schema([
 
 
 # Loading the Dataset and initializing the label encoder
-data = pd.read_csv(f'{sys.argv[1]}.csv')
 le = LabelEncoder()
 
-X_train,X_test = train_test_split(
-    data,
-    test_size=0.2,
-    random_state=42,
-    stratify=data['species']
-)
+X_train = pd.read_csv(f'{sys.argv[1]}.csv')
+X_test = pd.read_csv(f'{sys.argv[2]}.csv')
 
 # Defining multiple hyperparameters to perform hyperparameter tuning
+with mlflow.start_run() as ru
+    model = DecisionTreeClassifier(max_depth=3)
+    model.fit(X_train.drop(['species'],axis=1), le.fit_transform(X_train['species']))
 
-param_grid = [
-    {"criterion":"entropy", "max_depth": 3},
-    {"criterion":"log_loss", "max_depth": 4},  # 6
-    {"criterion":"gini", "max_depth": 2} # 8
-]
+    y_test = le.transform(X_test['species'])
+    y_pred = model.predict(X_test.drop(['species'],axis=1))
 
-for param in param_grid:
-    with mlflow.start_run() as run:
-        model = DecisionTreeClassifier(**param)
-        model.fit(X_train.drop(['species'],axis=1), le.fit_transform(X_train['species']))
+    acc_score = accuracy_score(y_test, y_pred)
 
-        y_test = le.transform(X_test['species'])
-        y_pred = model.predict(X_test.drop(['species'],axis=1))
+    signature = ModelSignature(inputs = input_schema, outputs = output_schema)
 
-        acc_score = accuracy_score(y_test, y_pred)
-
-        signature = ModelSignature(inputs = input_schema, outputs = output_schema)
-
-        mlflow.log_params(param)
-        mlflow.log_metric("accuracy", acc_score)
-        mlflow.sklearn.log_model(sk_model=model, signature = signature,name="model")
+    mlflow.log_params(param)
+    mlflow.log_metric("accuracy", acc_score)
+    mlflow.sklearn.log_model(sk_model=model, signature = signature,name="model")
 
 # Need to get experiment_id to access the run_id and the model name of our best model to register it.
 
